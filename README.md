@@ -3,7 +3,7 @@ This script simply connects your Winamp with Discord rich presence and shows cur
 
 Winamp.py is a slightly modified version of [this](https://github.com/DerpyChap/PyWinamp) winamp controller. Unfortunately I dont know how to make Winamp plugins so the rp.py console needs to be always running. So far I have not encountered any problems while using this script.
 
-Fast forwarding tracks is not currently supported but I think that could be implemented pretty easily. However if you change the position of current track, pausing and unpausing on rebooting the rp.py should correct the elapsed time in Discord. If the trackname is less than 2 characters long it is changed to format `Track: {trackname}` (see example 3). This is because Discord rich presence supports only strings longer than one character.
+Fast forwarding tracks is not currently supported but I think that could be implemented pretty easily. However if you change the position of current track, pausing and unpausing or rebooting the rp.py should correct the elapsed time in Discord. If the trackname is less than 2 characters long it is changed to format `Track: {trackname}` (see example 3). This is because Discord rich presence supports only strings longer than one character.
 
 # Requirements
 - Winamp
