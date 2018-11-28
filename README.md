@@ -1,5 +1,5 @@
 # WinampRPC
-This script simply makes a rich presence into Discord and shows the track and artist you are playing. Winamp.py is a slightly modified version [this][https://github.com/DerpyChap/PyWinamp] winamp controller. Unfortunately I dont know how to make Winamp plugins so the rp.py console needs to be always running. So far I have not encountered any problems while using this script.
+This script simply makes a rich presence into Discord and shows the track and artist you are playing. Winamp.py is a slightly modified version [this](https://github.com/DerpyChap/PyWinamp) winamp controller. Unfortunately I dont know how to make Winamp plugins so the rp.py console needs to be always running. So far I have not encountered any problems while using this script.
 # Requirements
 - Winamp
 - Python 3.6+
