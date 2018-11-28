@@ -10,7 +10,7 @@ Fast forwarding tracks is not currently supported but I think that could be impl
 - Python 3.6+
 - `pypresence` 3.3.0+
 
-Code could work with older python versions if you convert f-strings into older format. Any relatively new Winamp versions should be fine. Im using the newest official version ([link](https://www.winamp.com/)).
+Code could work with older python versions if you convert f-strings into older format. Any relatively new Winamp version should be fine. Im using the newest official version ([link](https://www.winamp.com/)).
 
 # How to use
 1. Ensure you meet the requirements
