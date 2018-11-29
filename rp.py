@@ -38,7 +38,7 @@ cleared = False
 def update_rpc():
     global previous_track
     global cleared
-    trackinfo_raw = w.getCurrentTrackName()
+    trackinfo_raw = w.getCurrentTrackName()  # This is in format {tracknum}. {artist} - {track title} - Winamp
 
     if trackinfo_raw != previous_track:
         winampver = w.getVersion()
