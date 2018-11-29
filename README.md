@@ -19,7 +19,7 @@ Code could work with older python versions if you convert f-strings into older f
 3. Run rp.py while using winamp
 
 # Examples
-As seen in these images, there should not be problem with showing any kind of characters.
+As seen in these images, there should not be problem with showing any kind of characters as long as winamp can read them properly.
 
 ![cyrillic example](https://i.imgur.com/Llzdby7.png)
 ![japanese example](https://i.imgur.com/7m51K2G.png)
