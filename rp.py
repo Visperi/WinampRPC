@@ -49,7 +49,7 @@ def update_rpc():
         pos, now = w.getTrackStatus()[1] / 1000, time.time()  # [s]
         if len(trackname) < 2:
             trackname = f"Track: {trackname}"
-        if pos >= 10000:
+        if pos >= 100000:  # Sometimes this is over 4 million if a new track starts
             pos = 0
         start = now - pos
         rpc.update(details=trackname, state=f"by {artist}", start=int(start), large_image="logo",
