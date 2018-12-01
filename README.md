@@ -6,12 +6,14 @@ Winamp.py is a slightly modified version of [this](https://github.com/DerpyChap/
 Fast forwarding tracks is not currently supported but I think that could be implemented pretty easily. However if you change the position of current track, pausing and unpausing or restarting the rp.py should correct the elapsed time in Discord. If the trackname is less than 2 characters long it is changed to format `Track: {trackname}` (see example 3). This is because Discord rich presence supports only strings longer than one character.
 
 # Requirements
+**Note: This script assumes your title formatting in Winamp is [%artist% - ]$if2(%title%,$filepart(%filename%))**
+
 - Winamp
 - Python 3.6+
 - `pypresence` 3.3.0+
 - `pywin32` 224+
 
-Code could work with older python versions if you convert f-strings in rp.py into older format. Any relatively new Winamp version should be fine. Im using the newest official version ([link](https://www.winamp.com/)).
+Code could work with older python versions if you convert f-strings in rp.py into older format. Any relatively new Winamp version should be fine. Im using the latest official version ([link](https://www.winamp.com/)).
 
 # How to use
 1. Ensure you meet the requirements
