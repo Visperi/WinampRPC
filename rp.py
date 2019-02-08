@@ -33,6 +33,7 @@ w = winamp.Winamp()
 
 previous_track = ""
 cleared = False
+winampver = w.getVersion()
 
 
 def update_rpc():
@@ -41,12 +42,13 @@ def update_rpc():
     trackinfo_raw = w.getCurrentTrackName()  # This is in format {tracknum}. {artist} - {track title} - Winamp
 
     if trackinfo_raw != previous_track:
-        winampver = w.getVersion()
         previous_track = trackinfo_raw
-        trackinfo, tracknum = trackinfo_raw.split(" - "), w.getCurrentTrack() + 1
+        trackinfo = trackinfo_raw.split(" - ")[:-1]
+        tracknum = w.getCurrentTrack() + 1
         artist = trackinfo[0].strip(f"{tracknum}. ")
-        trackname = trackinfo[1]
-        pos, now = w.getTrackStatus()[1] / 1000, time.time()  # [s]
+        trackname = " - ".join(trackinfo[1:])
+        pos, now = w.getTrackStatus()[1] / 1000, time.time()  # Both are in seconds
+
         if len(trackname) < 2:
             trackname = f"Track: {trackname}"
         if pos >= 100000:  # Sometimes this is over 4 million if a new track starts
