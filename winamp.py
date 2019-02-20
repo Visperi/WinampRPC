@@ -149,7 +149,3 @@ class Winamp:
             if line[0] != "#":
                 playlist.append(line[:-1])
         return playlist
-
-
-if __name__ == "__main__":
-    exit()

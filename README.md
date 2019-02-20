@@ -5,7 +5,7 @@ Winamp.py is a slightly modified version of [this](https://github.com/DerpyChap/
 
 Fast forwarding tracks is not currently supported but I think that could be implemented pretty easily. However if you change the position of current track, pausing and unpausing or restarting the rp.py should correct the elapsed time in Discord. If the trackname is less than 2 characters long it is changed to format `Track: {trackname}` (see example 3). This is because Discord rich presence supports only strings longer than one character.
 
-**Album covers** are not supported due to how enormous the amount of assets would get very quickly. I dont even have them for myself. But hey, at least everyone can still see what a cool music you're listening.
+**Album covers** are not supported due to how enormous the amount of assets would get very quickly. I dont even have them for myself.
 
 # Requirements
 - Winamp
