@@ -52,7 +52,7 @@ class Winamp:
         self.sVersion = f"{hexVersionNumber[2]}.{hexVersionNumber[4:]}"
 
     def command(self, sCommand):
-        if sCommand in Winamp.winamp_commands:
+        if sCommand in self.winamp_commands:
             return win32api.SendMessage(self.hWinamp, WM_COMMAND, self.winamp_commands[sCommand], 0)
         else:
             print("NoSuchWinampCommand")
