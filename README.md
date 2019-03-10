@@ -9,7 +9,7 @@ change the position of current track, pausing and unpausing or restarting the ma
 in Discord. If the trackname is less than 2 characters long it is changed to format `Track: {trackname}` (see example 3). 
 This is because Discord rich presence supports only strings longer than one character.
 
-# Requirements
+## Requirements
 
 - Winamp
 - Python 3.6+
@@ -18,13 +18,13 @@ This is because Discord rich presence supports only strings longer than one char
 
 Any relatively new Winamp version should be fine. Im using the latest official version ([link](https://www.winamp.com/)).
 
-# How to use
+## How to use
 
 1. Ensure you meet the requirements
 2. Download the files and place them in the same directory
 3. Run main.py while using winamp
 
-# Custom assets
+## Custom assets
 
 To show album art instead of default Winamp logo, you need to:
  
@@ -32,7 +32,8 @@ To show album art instead of default Winamp logo, you need to:
 2. Replace the client_id to your app id and set custom_assets true in `settings.json`
 3. Define the default large asset key and text (if any) in `settings.json`
 3. Define the small asset key and text (if any) in `settings.json`
-4. Upload some assets and add `album name: asset key` pairs to `album_covers.json` (excet the default large asset and small asset)
+4. Upload some assets and add `album name: asset key` pairs to `album_covers.json` (except the default large asset key 
+and small asset key)
  
 Do note that due to restrictions in the api, following rules must be followed when making asset keys:
 
@@ -40,7 +41,7 @@ Do note that due to restrictions in the api, following rules must be followed wh
 - The keys must not have any special characters (including spaces)
 - The keys in `album_covers.json` and `settings.json` must be exact matches with the ones in the api
 
-# Examples
+## Examples
 
 As seen in these images, there should not be problem with showing any kind of characters as long as winamp can read 
 them properly.
