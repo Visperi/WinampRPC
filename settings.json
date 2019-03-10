@@ -1,5 +1,5 @@
 {
-  "comment_": "Default album name 'winamp version' is shown as 'Winamp vX.YZ' and 'album name' as album name",
+  "comment_": "Default_asset_name 'winamp version' shows your Winamp version and 'album name' the current playing album",
   "default_asset_key": "logo",
   "default_asset_name": "winamp version",
   "small_asset_key": "playbutton",
