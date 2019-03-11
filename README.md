@@ -34,7 +34,7 @@ To show album art instead of default Winamp logo, you need to:
     * set `custom_assets` true 
     * Define the default large asset key and text (if any)
     * Define the small asset key and text (if any)
-4. Upload some assets and add corresponding `album name: asset key` pairs to `album_covers.json` (except the default 
+3. Upload some assets and add corresponding `album name: asset key` pairs to `album_covers.json` (except the default 
 large asset key and small asset key)
  
 Do note that due to restrictions in the api, following rules must be followed when making asset keys:
@@ -55,3 +55,4 @@ them properly.
 ![cyrillic example](https://i.imgur.com/Llzdby7.png)
 ![japanese example](https://i.imgur.com/7m51K2G.png)
 ![short track name](https://i.imgur.com/o8nLrwI.png)
+![custom asset](https://i.imgur.com/F08aPu1.png)
