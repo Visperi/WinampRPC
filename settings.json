@@ -1,5 +1,6 @@
 {
   "comment_": "Default_asset_name 'winamp version' shows your Winamp version and 'album name' the current playing album",
+  "client_id": "507484022675603456",
   "default_asset_key": "logo",
   "default_asset_name": "winamp version",
   "small_asset_key": "playbutton",
