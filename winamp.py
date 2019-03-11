@@ -80,11 +80,12 @@ class Winamp:
         """
         iStatus = self.usercommand(104)
         if iStatus == 1:
-            return 'playing'
+            status = "playing"
         elif iStatus == 3:
-            return 'paused'
+            status = "paused"
         else:
-            return 'stopped'
+            status = "stopped"
+        return status
 
     def getTrackStatus(self):
         """

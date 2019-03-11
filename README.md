@@ -29,17 +29,23 @@ Any relatively new Winamp version should be fine. Im using the latest official v
 To show album art instead of default Winamp logo, you need to:
  
 1. Make your own Discord app for this script
-2. Replace the client_id to your app id and set custom_assets true in `settings.json`
-3. Define the default large asset key and text (if any) in `settings.json`
-3. Define the small asset key and text (if any) in `settings.json`
-4. Upload some assets and add `album name: asset key` pairs to `album_covers.json` (except the default large asset key 
-and small asset key)
+2. In `settings.json`
+    * Replace the `client_id` with your app id
+    * set `custom_assets` true 
+    * Define the default large asset key and text (if any)
+    * Define the small asset key and text (if any)
+4. Upload some assets and add corresponding `album name: asset key` pairs to `album_covers.json` (except the default 
+large asset key and small asset key)
  
 Do note that due to restrictions in the api, following rules must be followed when making asset keys:
 
 - The keys must be maximum of 30 characters long
 - The keys must not have any special characters (including spaces)
 - The keys in `album_covers.json` and `settings.json` must be exact matches with the ones in the api
+
+In case Discord can't find any match for asset key from their api, the asset in question is simply ignored. Therefore 
+if you wish to leave the small asset out, just set at least the small asset key empty. Same thing applies to large 
+assets. If your large asset is missing there is no matching key for your default asset or album cover.
 
 ## Examples
 
