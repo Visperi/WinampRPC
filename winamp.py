@@ -70,13 +70,13 @@ class Winamp:
 
     def getVersion(self):
         """
-        returns the version number of winamp
+        :return: the version number of winamp
         """
         return self.sVersion
 
     def getPlayingStatus(self):
         """
-        returns the current status string which is one of 'playing', 'paused' or 'stopped'
+        :return: The current playing status which is 'playing', 'paused' or 'stopped'
         """
         iStatus = self.usercommand(104)
         if iStatus == 1:
@@ -89,7 +89,7 @@ class Winamp:
 
     def getTrackStatus(self):
         """
-        returns a tuple (total_length, current_position) where both are in msecs.By default the track length is in
+        :return: a tuple (total_length, current_position) where both are in msecs. By default the track length is in
         seconds.
         """
         iTotalLength = self.usercommand(105, 1) * 1000
@@ -103,9 +103,16 @@ class Winamp:
         return self.usercommand(121, iTrackNumber)
 
     def getCurrentTrack(self):
+        """
+        :return: The position of currently playing track in the playlist, starting from 0
+        """
         return self.usercommand(125)
 
     def getCurrentTrackName(self):
+        """
+        :return: Currently playing track name in format that is seen in Winamp's Window text. Usually in format
+        '{track number}. {artist} - {track name} - Winamp'
+        """
         return win32gui.GetWindowText(self.hWinamp)
 
     def seekWithinTrack(self, iPositionMsecs):
@@ -128,7 +135,7 @@ class Winamp:
 
     def getTrackInfo(self):
         """
-        returns a tuple (samplerate, bitrate, number of channels)
+        :return: Sample rate, bitrate and number of audio channels of currently playing song
         """
         iSampleRate = self.usercommand(126, 0)
         iBitRate = self.usercommand(126, 1)
@@ -138,15 +145,26 @@ class Winamp:
     def dumpList(self):
         """
         dumps the current playlist into WINAMPDIR/winamp.m3u
+        WINAMPDIR is by default located in C:/Users/user/AppData/Roaming/Winamp/
+
+        :return: The position of currently playing track in the playlist, starting from 0
         """
         return self.usercommand(120)
 
     @staticmethod
     def getTrackList(sPlaylistFilepath):
-        with open(sPlaylistFilepath, "r") as playlistfile:
-            lines = playlistfile.readlines()
+        """
+        Open playlist file Winamp.m3u8 which is by default located in C:/Users/user/AppData/Roaming/Winamp/
+        Open .m3u8 instead of .m3u because it supports utf-8 and is in plain text anyways. Open file with encoding
+        utf-8-sig so the BOM characters \\ufeff are omitted and its easier to parse through the paths.
+
+        :param sPlaylistFilepath: Path to the playlist file Winamp.m3u8
+        :return: List of Absolute paths to all tracks in given playlist
+        """
+        with open(sPlaylistFilepath, "r", encoding="utf-8-sig") as playlist_file:
+            lines = playlist_file.readlines()
         playlist = []
         for line in lines:
             if line[0] != "#":
-                playlist.append(line[:-1])
+                playlist.append(line[:-1])  # Lines end in \n in playlist files
         return playlist

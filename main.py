@@ -22,7 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-
 from pypresence import Presence
 import time
 import winamp
@@ -41,11 +40,10 @@ def get_settings():
         settings["small_asset_key"], settings["small_asset_text"], settings["custom_assets"]
 
 
+client_id, default_large_key, default_large_text, small_asset_key, small_asset_text, custom_assets = get_settings()
+
 w = winamp.Winamp()
 winamp_version = w.getVersion()
-client_id, default_large_key, default_large_name, small_asset_key, small_asset_text, custom_assets = get_settings()
-
-
 rpc = Presence(client_id)
 rpc.connect()
 
@@ -67,14 +65,14 @@ if custom_assets:
 def get_album_art(track_position):
     """
     Dump current playlist into C:\\Users\\username\\Appdata\\Roaming\\Winamp\\Winamp.m3u8. Then read the path of current
-    track from the file and find the album name from its path. If album has an asset in Discord api and corresponding
-    key in file album_covers.json, return the asset key and album name. Otherwise return defaults 'Winamp vXY.Z' and
-    winamp logo asset key. Also, this assumes the music directory paths are like artist\\album\\tracks. If the folder
-    structure is something else, the album_name variable may not be the album name and you need to check these manually.
+    track from the file and find the album name from it. If album has corresponding album name with key in file
+    album_covers.json, return the asset key and album name. Otherwise return default asset key and text. Also, this
+    function assumes the music directory structure is like artist\\album\\tracks. If the folder structure is something
+    else, the album_name variable may not be the album name and you need to check these manually.
     This function is used only if custom_assets is set to True and album_covers.json is found.
 
     :param track_position: Current track's position in the playlist, starting from 0
-    :return: Album asset key and album name. Asset key in api must be exactly same as this.
+    :return: Album asset key and album name. Asset key in api must be exactly same as this key.
     """
 
     w.dumpList()
@@ -93,12 +91,12 @@ def get_album_art(track_position):
     except KeyError:
         # Could not find asset key for album cover. Use default asset and asset text instead
         large_asset_key = default_large_key
-        if default_large_name == "winamp version":
+        if default_large_text == "winamp version":
             large_asset_text = f"Winamp v{winamp_version}"
-        elif default_large_name == "album name":
+        elif default_large_text == "album name":
             large_asset_text = album_name
         else:
-            large_asset_text = default_large_name
+            large_asset_text = default_large_text
 
     return large_asset_key, large_asset_text
 
