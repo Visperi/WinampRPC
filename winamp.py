@@ -166,5 +166,5 @@ class Winamp:
         playlist = []
         for line in lines:
             if line[0] != "#":
-                playlist.append(line[:-1])  # Lines end in \n in playlist files
+                playlist.append(line[:-1])  # Ignore '\n' at the end of lines
         return playlist

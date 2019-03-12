@@ -53,16 +53,23 @@ cleared = False
 # If boolean custom_assets is set True, try to load file for album assets
 if custom_assets:
     try:
-        # File for album cover assets is loaded only when starting the script so restart is needed when new albums
-        # are added
+        with open(f"{main_path}album_name_exceptions.txt", "r") as file:
+            album_exceptions = file.read().splitlines()
+    except FileNotFoundError:
+        print("Could not find album_name_exceptions.txt. Default (or possibly wrong) assets will be used for duplicate "
+              "album names.")
+        album_exceptions = []
+    try:
+        # Files for album cover assets and album name exceptions are loaded only when starting the script so restart is
+        # needed when new albums are added
         with open(f"{main_path}\\album_covers.json", encoding="utf8") as data_file:
             album_asset_keys = json.load(data_file)
     except FileNotFoundError:
-        print("Could not find album_covers.json. Default images will be used.")
+        print("Could not find album_covers.json. Default assets will be used.")
         custom_assets = False
 
 
-def get_album_art(track_position):
+def get_album_art(track_position, artist):
     """
     Dump current playlist into C:\\Users\\username\\Appdata\\Roaming\\Winamp\\Winamp.m3u8. Then read the path of current
     track from the file and find the album name from it. If album has corresponding album name with key in file
@@ -72,6 +79,8 @@ def get_album_art(track_position):
     This function is used only if custom_assets is set to True and album_covers.json is found.
 
     :param track_position: Current track's position in the playlist, starting from 0
+    :param artist: Current track's artist. This is needed in case album name is in exceptions i.e. there are multiple
+    albums with same name
     :return: Album asset key and album name. Asset key in api must be exactly same as this key.
     """
 
@@ -85,9 +94,14 @@ def get_album_art(track_position):
     # Get the tail of the path i.e. the album name
     album_name = os.path.basename(track_path)
 
+    large_asset_text = album_name
+    # If there are multiple albums with same name and they are added into exceptions file, use 'Artist - Album' instead
+    if album_name in album_exceptions:
+        album_key = f"{artist} - {album_name}"
+    else:
+        album_key = album_name
     try:
-        large_asset_key = album_asset_keys[album_name]
-        large_asset_text = album_name
+        large_asset_key = album_asset_keys[album_key]
     except KeyError:
         # Could not find asset key for album cover. Use default asset and asset text instead
         large_asset_key = default_large_key
@@ -97,6 +111,9 @@ def get_album_art(track_position):
             large_asset_text = album_name
         else:
             large_asset_text = default_large_text
+
+    if len(large_asset_text) < 2:
+        large_asset_text = f"Album: {large_asset_text}"
 
     return large_asset_key, large_asset_text
 
@@ -122,7 +139,7 @@ def update_rpc():
 
         # If boolean custom_assets is set true, get the asset key and text from album_covers.json
         if custom_assets:
-            large_asset_key, large_asset_text = get_album_art(track_pos)
+            large_asset_key, large_asset_text = get_album_art(track_pos, artist)
         else:
             large_asset_key = "logo"
             large_asset_text = f"Winamp v{winamp_version}"
