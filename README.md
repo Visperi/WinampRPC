@@ -40,7 +40,7 @@ large asset key and small asset key)
 
 If you have multiple albums with same name, add the duplicate album name to `album_name_exceptions.txt` each on their 
 own line. These albums are then returned in format `Artist - Album name` instead of just the album name when searching 
-for album asset keys. Remember to take this into account when adding new data to `album_covers.json`.
+for album asset keys. Remember to take this into account when adding new data to the api and `album_covers.json`.
  
 Do note that due to restrictions in the api, following rules must be followed when making asset keys:
 

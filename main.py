@@ -53,7 +53,7 @@ cleared = False
 # If boolean custom_assets is set True, try to load file for album assets
 if custom_assets:
     try:
-        with open(f"{main_path}album_name_exceptions.txt", "r") as file:
+        with open(f"{main_path}\\album_name_exceptions.txt", "r") as file:
             album_exceptions = file.read().splitlines()
     except FileNotFoundError:
         print("Could not find album_name_exceptions.txt. Default (or possibly wrong) assets will be used for duplicate "
