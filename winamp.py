@@ -162,9 +162,10 @@ class Winamp:
         :return: List of Absolute paths to all tracks in given playlist
         """
         with open(sPlaylistFilepath, "r", encoding="utf-8-sig") as playlist_file:
-            lines = playlist_file.readlines()
+            # Use built-in method to split file lines to list
+            lines = playlist_file.read().splitlines()
         playlist = []
         for line in lines:
             if line[0] != "#":
-                playlist.append(line[:-1])  # Ignore '\n' at the end of lines
+                playlist.append(line)
         return playlist

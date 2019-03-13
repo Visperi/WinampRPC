@@ -28,45 +28,36 @@ import winamp
 import os
 import json
 
-# Get the directory where this script was executed to ensure python can find .json files
-main_path = os.path.dirname(__file__)
 
+def update_rpc():
+    global previous_track
+    global cleared
+    trackinfo_raw = w.getCurrentTrackName()  # This is in format {tracknum}. {artist} - {track title} - Winamp
 
-def get_settings():
-    with open(f"{main_path}\\settings.json") as settings_file:
-        settings = json.load(settings_file)
+    if trackinfo_raw != previous_track:
+        previous_track = trackinfo_raw
+        trackinfo = trackinfo_raw.split(" - ")[:-1]
+        track_pos = w.getCurrentTrack()  # Track position in the playlist
+        artist = trackinfo[0].strip(f"{track_pos + 1}. ")
+        track_name = " - ".join(trackinfo[1:])
+        pos, now = w.getTrackStatus()[1] / 1000, time.time()  # Both are in seconds
 
-    return settings["client_id"], settings["default_asset_key"], settings["default_asset_name"], \
-        settings["small_asset_key"], settings["small_asset_text"], settings["custom_assets"]
+        if len(track_name) < 2:
+            track_name = f"Track: {track_name}"
+        if pos >= 100000:  # Sometimes this is over 4 million if a new track starts
+            pos = 0
+        start = now - pos
 
+        # If boolean custom_assets is set true, get the asset key and text from album_covers.json
+        if custom_assets:
+            large_asset_key, large_asset_text = get_album_art(track_pos, artist)
+        else:
+            large_asset_key = "logo"
+            large_asset_text = f"Winamp v{winamp_version}"
 
-client_id, default_large_key, default_large_text, small_asset_key, small_asset_text, custom_assets = get_settings()
-
-w = winamp.Winamp()
-winamp_version = w.getVersion()
-rpc = Presence(client_id)
-rpc.connect()
-
-previous_track = ""
-cleared = False
-
-# If boolean custom_assets is set True, try to load file for album assets
-if custom_assets:
-    try:
-        with open(f"{main_path}\\album_name_exceptions.txt", "r") as file:
-            album_exceptions = file.read().splitlines()
-    except FileNotFoundError:
-        print("Could not find album_name_exceptions.txt. Default (or possibly wrong) assets will be used for duplicate "
-              "album names.")
-        album_exceptions = []
-    try:
-        # Files for album cover assets and album name exceptions are loaded only when starting the script so restart is
-        # needed when new albums are added
-        with open(f"{main_path}\\album_covers.json", encoding="utf8") as data_file:
-            album_asset_keys = json.load(data_file)
-    except FileNotFoundError:
-        print("Could not find album_covers.json. Default assets will be used.")
-        custom_assets = False
+        rpc.update(details=track_name, state=f"by {artist}", start=int(start), large_image=large_asset_key,
+                   small_image=small_asset_key, large_text=large_asset_text, small_text=small_asset_text)
+        cleared = False
 
 
 def get_album_art(track_position, artist):
@@ -118,36 +109,45 @@ def get_album_art(track_position, artist):
     return large_asset_key, large_asset_text
 
 
-def update_rpc():
-    global previous_track
-    global cleared
-    trackinfo_raw = w.getCurrentTrackName()  # This is in format {tracknum}. {artist} - {track title} - Winamp
+# Get the directory where this script was executed to ensure python can find all files
+main_path = os.path.dirname(__file__)
 
-    if trackinfo_raw != previous_track:
-        previous_track = trackinfo_raw
-        trackinfo = trackinfo_raw.split(" - ")[:-1]
-        track_pos = w.getCurrentTrack()  # Track position in the playlist
-        artist = trackinfo[0].strip(f"{track_pos + 1}. ")
-        track_name = " - ".join(trackinfo[1:])
-        pos, now = w.getTrackStatus()[1] / 1000, time.time()  # Both are in seconds
+# Load current settings to a dictionary and assign them to variables
+with open(f"{main_path}\\settings.json") as settings_file:
+    settings = json.load(settings_file)
 
-        if len(track_name) < 2:
-            track_name = f"Track: {track_name}"
-        if pos >= 100000:  # Sometimes this is over 4 million if a new track starts
-            pos = 0
-        start = now - pos
+client_id = settings["client_id"]
+default_large_key = settings["default_asset_key"]
+default_large_text = settings["default_asset_text"]
+small_asset_key = settings["small_asset_key"]
+small_asset_text = settings["small_asset_text"]
+custom_assets = settings["custom_assets"]
 
-        # If boolean custom_assets is set true, get the asset key and text from album_covers.json
-        if custom_assets:
-            large_asset_key, large_asset_text = get_album_art(track_pos, artist)
-        else:
-            large_asset_key = "logo"
-            large_asset_text = f"Winamp v{winamp_version}"
+w = winamp.Winamp()
+rpc = Presence(client_id)
+rpc.connect()
 
-        rpc.update(details=track_name, state=f"by {artist}", start=int(start), large_image=large_asset_key,
-                   small_image=small_asset_key, large_text=large_asset_text, small_text=small_asset_text)
-        cleared = False
+winamp_version = w.getVersion()
+previous_track = ""
+cleared = False
 
+# If boolean custom_assets is set True, try to load file for album assets and album name exceptions
+# Files for album cover assets and album name exceptions are loaded only when starting the script so restart is
+# needed when new albums are added
+if custom_assets:
+    try:
+        with open(f"{main_path}\\album_name_exceptions.txt", "r", encoding="utf8") as exceptions_file:
+            album_exceptions = exceptions_file.read().splitlines()
+    except FileNotFoundError:
+        print("Could not find album_name_exceptions.txt. Default (or possibly wrong) assets will be used for duplicate "
+              "album names.")
+        album_exceptions = []
+    try:
+        with open(f"{main_path}\\album_covers.json", encoding="utf8") as data_file:
+            album_asset_keys = json.load(data_file)
+    except FileNotFoundError:
+        print("Could not find album_covers.json. Default assets will be used.")
+        custom_assets = False
 
 while True:
     status = w.getPlayingStatus()
