@@ -22,7 +22,8 @@ Any relatively new Winamp version should be fine. Im using the latest official v
 
 1. Ensure you meet the requirements
 2. Download the files and place them in the same directory
-3. Run main.py while using Winamp
+3. (*optional*) Set up some custom assets
+4. Run main.py while using Winamp
 
 ## Custom assets
 
