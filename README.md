@@ -29,19 +29,21 @@ Any relatively new Winamp version should be fine. Im using the latest official v
 
 To show album art instead of default Winamp logo, you need to:
 
-1. Make your own Discord app for this script
+1. Make your own Discord app for this script in their [Developer portal](https://discordapp.com/developers/applications/)
 2. Make files `album_covers.json` and `album_name_exceptions.txt`
 3. In `settings.json`
     * Replace the `client_id` with your app id
     * set `custom_assets` true 
-    * Define the default large asset key and text (if any)
-    * Define the small asset key and text (if any)
-4. Upload some assets and add corresponding `album name: asset key` pairs to `album_covers.json` (except the default 
-large asset key and small asset key)
+    * (*optional*) Define a default asset key and text for large asset (if given, this is shown when an album asset 
+    could not be found)
+    * (*optional*) Define a small asset key and text (if given, this is shown when a track is playing)
+4. Upload default assets with keys matching to ones given in `setting.json`
+5. Upload some album assets and add corresponding `album name: asset key` pairs to `album_covers.json` (so no default 
+asset keys are needed in this file)
 
-If you have multiple albums with same name, add the duplicate album name to `album_name_exceptions.txt` each on their 
-own line. These albums are then returned in format `Artist - Album name` instead of just the album name when searching 
-for album asset keys. Remember to take this into account when adding new data to the api and `album_covers.json`.
+If you have multiple albums with same names, add the duplicate album names to `album_name_exceptions.txt` each on their 
+own line. These album names are then returned in format `Artist - Album name` instead of just the album name.  
+Remember to take this into account when adding new keys to the api and `album_covers.json`.
  
 Do note that due to restrictions in the api, following rules must be followed when making asset keys:
 
@@ -51,8 +53,8 @@ Do note that due to restrictions in the api, following rules must be followed wh
 - The keys in `album_covers.json` and `settings.json` must be exact matches with the ones in the api
 
 In case Discord can't find any match for asset key from their api, the asset in question is simply ignored. Therefore 
-if you wish to leave the small asset out, just set at least the small asset key empty. Same thing applies to large 
-assets. If your large asset is missing there is no matching key for your default asset or album cover.
+if you wish to leave the small asset out, just set the small asset key empty. Same thing applies to large 
+assets. If your large asset is missing there are no matching keys for your default large asset or album cover.
 
 ## Examples
 

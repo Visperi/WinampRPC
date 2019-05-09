@@ -123,6 +123,9 @@ small_asset_key = settings["small_asset_key"]
 small_asset_text = settings["small_asset_text"]
 custom_assets = settings["custom_assets"]
 
+if client_id == "default":
+    client_id = "507484022675603456"
+
 w = winamp.Winamp()
 rpc = Presence(client_id)
 rpc.connect()
