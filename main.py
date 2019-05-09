@@ -60,7 +60,7 @@ def update_rpc():
         cleared = False
 
 
-def get_album_art(track_position, artist):
+def get_album_art(track_position: int, artist: str):
     """
     Dump current playlist into C:\\Users\\username\\Appdata\\Roaming\\Winamp\\Winamp.m3u8. Then read the path of current
     track from the file and find the album name from it. If album has corresponding album name with key in file
@@ -109,16 +109,31 @@ def get_album_art(track_position, artist):
     return large_asset_key, large_asset_text
 
 
-# Get the directory where this script was executed to ensure python can find all files
+# Get the directory where this script was executed to make sure Python can find all files.
 main_path = os.path.dirname(__file__)
 
-# Load current settings to a dictionary and assign them to variables
-with open(f"{main_path}\\settings.json") as settings_file:
-    settings = json.load(settings_file)
+# Load current settings to a dictionary and assign them to variables. If settings file can't be found, make a new one
+# with default settings.
+try:
+    with open(f"{main_path}\\settings.json") as settings_file:
+        settings = json.load(settings_file)
+except FileNotFoundError:
+    settings = {"_comment": "Default_large_asset_text 'winamp version' shows your Winamp version and 'album name' "
+                            "the current playing album",
+                "client_id": "default",
+                "default_large_asset_key": "logo",
+                "default_large_asset_text": "winamp version",
+                "small_asset_key": "playbutton",
+                "small_asset_text": "Playing",
+                "custom_assets": False}
+
+    with open(f"{main_path}\\settings.json", "w") as settings_file:
+        json.dump(settings, settings_file, indent=2)
+    print("Could not find settings.json. Made new settings file with default values.")
 
 client_id = settings["client_id"]
-default_large_key = settings["default_asset_key"]
-default_large_text = settings["default_asset_text"]
+default_large_key = settings["default_large_asset_key"]
+default_large_text = settings["default_large_asset_text"]
 small_asset_key = settings["small_asset_key"]
 small_asset_text = settings["small_asset_text"]
 custom_assets = settings["custom_assets"]
@@ -134,7 +149,7 @@ winamp_version = w.getVersion()
 previous_track = ""
 cleared = False
 
-# If boolean custom_assets is set True, try to load file for album assets and album name exceptions
+# If boolean custom_assets is set True, try to load file for album assets and album name exceptions.
 # Files for album cover assets and album name exceptions are loaded only when starting the script so restart is
 # needed when new albums are added
 if custom_assets:
