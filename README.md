@@ -23,7 +23,7 @@ Any relatively new Winamp version should be fine. Im using the latest official v
 1. Ensure you meet the requirements
 2. Download the files and place them in the same directory
 3. (*optional*) Set up some custom assets
-4. Run main.py while using Winamp
+4. Run main.py while using Winamp and Discord
 
 ## Custom assets
 
@@ -37,7 +37,7 @@ To show album art instead of default Winamp logo, you need to:
     * (*optional*) Define a default asset key and text for large asset (if given, this is shown when an album asset 
     could not be found)
     * (*optional*) Define a small asset key and text (if given, this is shown when a track is playing)
-4. Upload default assets with keys matching to ones given in `setting.json`
+4. Upload default assets with keys matching to ones given in `settings.json`
 5. Upload some album assets and add corresponding `album name: asset key` pairs to `album_covers.json` (so no default 
 asset keys are needed in this file)
 
@@ -45,16 +45,17 @@ If you have multiple albums with same names, add the duplicate album names to `a
 own line. These album names are then returned in format `Artist - Album name` instead of just the album name.  
 Remember to take this into account when adding new keys to the api and `album_covers.json`.
  
-Do note that due to restrictions in the api, following rules must be followed when making asset keys:
+Do note that due to restrictions in the api, following rules must be followed when adding album assets:
 
-- There can be maximum of 150 assets for your app
+- There can be maximum of 300 assets for your app
 - The keys must be maximum of 30 characters long
 - The keys must not have any special characters (including spaces)
 - The keys in `album_covers.json` and `settings.json` must be exact matches with the ones in the api
 
 In case Discord can't find any match for asset key from their api, the asset in question is simply ignored. Therefore 
 if you wish to leave the small asset out, just set the small asset key empty. Same thing applies to large 
-assets. If your large asset is missing there are no matching keys for your default large asset or album cover.
+assets. If your large asset in Discord is missing, there are no matching keys for your default large asset or album 
+cover.
 
 ## Examples
 
