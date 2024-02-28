@@ -201,17 +201,6 @@ class CurrentTrack(Track):
 class Winamp:
 
     def __init__(self):
-        self.winamp_commands = {'prev': 40044,
-                                'next': 40048,
-                                'play': 40045,
-                                'pause': 40046,
-                                'stop': 40047,
-                                'fadeout': 40157,
-                                'forward': 40148,
-                                'rewind': 40144,
-                                'raisevol': 40058,
-                                'lowervol': 40059}
-
         self.window_id = None
         self._version = None
         self.connect()
