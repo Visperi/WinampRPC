@@ -25,7 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from typing import Tuple
+from enum import Enum
+from typing import Tuple, Union
 
 import win32api
 import win32gui
@@ -33,6 +34,117 @@ import win32gui
 # Wonder why win32 imports don't define these
 WM_COMMAND = 0x0111
 WM_USER = 0x400
+
+
+class WinampCommand(Enum):
+    """
+    Enum representing WM_COMMAND commands with correct data values. These commands are identical to pressing a
+    button in the player GUI.
+    """
+
+    ToggleRepeat = 40022
+    """
+    Toggle track repeating.
+    """
+    ToggleShuffle = 40023
+    """
+    Toggle track shuffling.
+    """
+    PreviousTrack = 40044
+    """
+    Go to previous track.
+    """
+    Play = 40045
+    """
+    Play current track or start it over if already playing.
+    """
+    TogglePause = 40046
+    """
+    Toggle pause.
+    """
+    Stop = 40047
+    """
+    Stop the current track. Seeks the track position to zero position.
+    """
+    NextTrack = 40048
+    """
+    Go to next track.
+    """
+    RaiseVolume = 40058
+    """
+    Raise volume by 1%.
+    """
+    LowerVolume = 40059
+    """
+    Lower volume by 1%.
+    """
+    FastRewind = 40144
+    """
+    Rewind the current track by 5 seconds.
+    """
+    FadeOutAndStop = 40147
+    """
+    Fade out and stop after the track.
+    """
+    FastForward = 40148
+    """
+    Fast forward the current track by 5 seconds.
+    """
+    StopAfterTrack = 40157
+    """
+    Stop after the current track.
+    """
+
+
+class UserCommand(Enum):
+    """
+    Enum representing WM_USER user commands sent to Winamp. These commands are sent to Winamp API and are not strictly
+    equal to pressing buttons in player GUI. Setter commands often need a separate value 'data' to have effect.
+    """
+
+    WinampVersion = 0
+    """
+    Current Winamp version in hexadecimal number.
+    """
+    PlayingStatus = 104
+    """
+    Current playing status. Returns 1 for playing, 3 for paused and otherwise stopped.
+    """
+    TrackStatus = 105
+    """
+    Get current tracks' status. Track position in milliseconds if data is set to 0, or track length in seconds if 
+    data is 1. 
+    """
+    SeekTrack = 106
+    """
+    Seek current track to position in milliseconds specified in data.
+    """
+    DumpPlaylist = 120
+    """
+    Dump current playlist to WINAMPDIR/winamp.m3u and resepective .m3u8 files, and return the current playlist 
+    position.
+    """
+    ChangeTrack = 121
+    """
+    Set the playlist position to position defined in data.
+    """
+    SetVolume = 122
+    """
+    Set the playback volume to value specified in data. The range is between 0 (muted) and 255 (max volume).
+    """
+    PlaylistLength = 124
+    """
+    Get the current playlist length in number of tracks.
+    """
+    TrackPosition = 125
+    """
+    Get the current playlist position in tracks.
+    """
+    TrackInfo = 126
+    """
+    Get technical information about the current track. Data values give following results: 0 for samplerate, 1 for 
+    bitrate and 2 for number of channels.
+    """
 
 
 class Winamp:
@@ -52,18 +164,32 @@ class Winamp:
         self.window = win32gui.FindWindow('Winamp v1.x', None)
         self._version = self.fetch_version()
 
-    def send_command(self, command):
-        if command in self.winamp_commands:
-            return win32api.SendMessage(self.window, WM_COMMAND, self.winamp_commands[command], 0)
-        else:
-            print("NoSuchWinampCommand")
-            exit()
+    def send_command(self, command: Union[WinampCommand, int]):
+        """
+        Send WM_COMMAND command to Winamp.
 
-    def send_user_command(self, id_: int, data: int = 0):
-        return win32api.SendMessage(self.window, WM_USER, data, id_)
+        :param command: The command to send.
+        :return: Response from Winamp.
+        """
 
-    def get_filepath(self):
-        return self.send_user_command(0, 3031)
+        if isinstance(command, WinampCommand):
+            command = command.value
+
+        return win32api.SendMessage(self.window, WM_COMMAND, command, 0)
+
+    def send_user_command(self, command: Union[UserCommand, int], data: int = 0):
+        """
+        Send WM_USER command to Winamp API.
+
+        :param command: The command to send.
+        :param data: Data to send with the command. For some commands this value affects the returned information.
+        :return: Response from the Winamp API.
+        """
+
+        if isinstance(command, UserCommand):
+            command = command.value
+
+        return win32api.SendMessage(self.window, WM_USER, data, command)
 
     @property
     def version(self):
@@ -80,7 +206,7 @@ class Winamp:
         :return: Winamp version number
         """
 
-        hex_version = self.send_user_command(0)  # Formatted as 0x50yz for Winamp version 5.yz etc.
+        hex_version = hex(self.send_user_command(0))  # Formatted as 0x50yz for Winamp version 5.yz etc.
 
         return f"{hex_version[2]}.{hex_version[4:]}"
 
