@@ -226,9 +226,11 @@ class Winamp:
     def __ensure_connection(self):
         """
         Raise an exception if no Winamp client is connected, otherwise do nothing.
+
+        :raises ConnectionError: If a connection to Winamp client is not established.
         """
         if self.window_id == 0:
-            raise ValueError("No Winamp client connected")
+            raise ConnectionError("No Winamp client connected")
 
     def send_command(self, command: Union[WinampCommand, int]) -> int:
         """
@@ -236,6 +238,8 @@ class Winamp:
 
         :param command: The command to send.
         :return: Response from Winamp.
+
+        :raises ConnectionError: If a connection to Winamp client is not established.
         """
         self.__ensure_connection()
 
@@ -251,6 +255,8 @@ class Winamp:
         :param command: The command to send.
         :param data: Data to send with the command. For some commands this value affects the returned information.
         :return: Response from the Winamp API.
+
+        :raises ConnectionError: If a connection to Winamp client is not established.
         """
 
         self.__ensure_connection()
@@ -264,6 +270,8 @@ class Winamp:
     def version(self) -> str:
         """
         The Winamp version.
+
+        :raises ConnectionError: If a connection to Winamp client is not established.
         """
         self.__ensure_connection()
 
@@ -288,6 +296,19 @@ class Winamp:
             return None
 
         return CurrentTrack(title, sample_rate, bitrate, num_channels, length, position, playlist_position)
+
+    def get_track_title(self) -> str:
+        """
+        Get the current track title.
+
+        :return: Currently playing track title in format that is seen in Winamp's Window text. Usually in format
+        '{track number}. {artist} - {track name} - Winamp'
+
+        :raises ConnectionError: If a connection to Winamp client is not established.
+        """
+        self.__ensure_connection()
+
+        return win32gui.GetWindowText(self.window_id)
 
     def fetch_version(self) -> str:
         """
@@ -349,17 +370,6 @@ class Winamp:
         """
 
         return self.send_user_command(UserCommand.PlaylistPosition)
-
-    def get_track_title(self) -> str:
-        """
-        Get the current track title.
-
-        :return: Currently playing track title in format that is seen in Winamp's Window text. Usually in format
-        '{track number}. {artist} - {track name} - Winamp'
-        """
-        self.__ensure_connection()
-
-        return win32gui.GetWindowText(self.window_id)
 
     def seek_track(self, position: int) -> int:
         """
