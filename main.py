@@ -33,12 +33,12 @@ from pypresence import Presence
 def update_rpc():
     global previous_track
     global cleared
-    trackinfo_raw = w.get_current_track_title()  # This is in format {tracknum}. {artist} - {track title} - Winamp
+    trackinfo_raw = w.get_track_title()  # This is in format {tracknum}. {artist} - {track title} - Winamp
 
     if trackinfo_raw != previous_track:
         previous_track = trackinfo_raw
         trackinfo = trackinfo_raw.split(" - ")[:-1]
-        track_pos = w.get_track_position()  # Track position in the playlist
+        track_pos = w.get_playlist_position()  # Track position in the playlist
         artist = trackinfo[0].strip(f"{track_pos + 1}. ")
         track_name = " - ".join(trackinfo[1:])
         pos, now = w.get_track_status()[1] / 1000, time.time()  # Both are in seconds

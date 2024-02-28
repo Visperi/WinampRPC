@@ -147,6 +147,38 @@ class UserCommand(Enum):
     """
 
 
+class Track:
+    """
+    A class representing a track.
+    """
+
+    def __init__(self, title: str, sample_rate: int, bitrate: int, channels: int, length: int):
+        self.title = title
+        self.sample_rate = sample_rate
+        self.bitrate = bitrate
+        self.channels = channels
+        self.length = length
+
+
+class CurrentTrack(Track):
+    """
+    A class representing current track.
+    """
+
+    def __init__(self,
+                 title: str,
+                 sample_rate: int,
+                 bitrate: int,
+                 channels: int,
+                 length: int,
+                 current_position: int,
+                 playlist_position: int
+                 ):
+        super().__init__(title, sample_rate, bitrate, channels, length)
+        self.current_position = current_position
+        self.playlist_position = playlist_position
+
+
 class Winamp:
 
     def __init__(self):
@@ -161,7 +193,15 @@ class Winamp:
                                 'raisevol': 40058,
                                 'lowervol': 40059}
 
-        self.window = win32gui.FindWindow('Winamp v1.x', None)
+        self.window_id = None
+        self._version = None
+        self.connect()
+
+    def connect(self):
+        """
+        Connect to a Winamp client.
+        """
+        self.window_id = win32gui.FindWindow("Winamp v1.x", None)
         self._version = self.fetch_version()
 
     def send_command(self, command: Union[WinampCommand, int]):
@@ -175,7 +215,7 @@ class Winamp:
         if isinstance(command, WinampCommand):
             command = command.value
 
-        return win32api.SendMessage(self.window, WM_COMMAND, command, 0)
+        return win32api.SendMessage(self.window_id, WM_COMMAND, command, 0)
 
     def send_user_command(self, command: Union[UserCommand, int], data: int = 0):
         """
@@ -189,7 +229,7 @@ class Winamp:
         if isinstance(command, UserCommand):
             command = command.value
 
-        return win32api.SendMessage(self.window, WM_USER, data, command)
+        return win32api.SendMessage(self.window_id, WM_USER, data, command)
 
     @property
     def version(self):
@@ -198,6 +238,21 @@ class Winamp:
         """
 
         return self._version
+
+    @property
+    def current_track(self) -> CurrentTrack:
+        """
+        Fetch the current track.
+
+        :return: CurrentTrack object that contains properties of the currently playing track.
+        """
+
+        title = self.get_track_title()
+        playlist_position = self.get_playlist_position()
+        length, position = self.get_track_status()
+        sample_rate, bitrate, num_channels = self.get_track_info()
+
+        return CurrentTrack(title, sample_rate, bitrate, num_channels, length, position, playlist_position)
 
     def fetch_version(self) -> str:
         """
@@ -232,13 +287,14 @@ class Winamp:
         """
         Get the current track status.
 
-        :return: A tuple (total_length, current_position) where both are in milliseconds.
+        :return: A tuple (total_length, current_position), both in milliseconds. The track length is -1 if no
+        track is playing or an error occurred.
         """
 
-        track_length = self.send_user_command(105, 1) * 1000
         track_position = self.send_user_command(105, 0)
+        track_length = self.send_user_command(105, 1)
 
-        return track_length, track_position
+        return track_length * 1000, track_position
 
     def change_track(self, track_number: int):
         """
@@ -249,7 +305,7 @@ class Winamp:
 
         return self.send_user_command(121, track_number)
 
-    def get_track_position(self):
+    def get_playlist_position(self):
         """
         Get current track position in the playlist.
 
@@ -258,7 +314,7 @@ class Winamp:
 
         return self.send_user_command(125)
 
-    def get_current_track_title(self):
+    def get_track_title(self):
         """
         Get the current track title.
 
@@ -266,7 +322,7 @@ class Winamp:
         '{track number}. {artist} - {track name} - Winamp'
         """
 
-        return win32gui.GetWindowText(self.window)
+        return win32gui.GetWindowText(self.window_id)
 
     def seek_track(self, position: int):
         """
@@ -302,9 +358,9 @@ class Winamp:
         :return: Sample rate, bitrate and number of audio channels of currently playing track.
         """
 
-        sample_rate = self.send_user_command(126, 0)
-        bitrate = self.send_user_command(126, 1)
-        num_channels = self.send_user_command(126, 2)
+        sample_rate = self.send_user_command(UserCommand.TrackInfo, 0)
+        bitrate = self.send_user_command(UserCommand.TrackInfo, 1)
+        num_channels = self.send_user_command(UserCommand.TrackInfo, 2)
 
         return sample_rate, bitrate, num_channels
 
