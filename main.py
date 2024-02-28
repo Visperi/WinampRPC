@@ -22,25 +22,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from pypresence import Presence
 import time
-import winamp
 import os
 import json
+
+import winamp
+from pypresence import Presence
 
 
 def update_rpc():
     global previous_track
     global cleared
-    trackinfo_raw = w.getCurrentTrackName()  # This is in format {tracknum}. {artist} - {track title} - Winamp
+    trackinfo_raw = w.get_current_track_title()  # This is in format {tracknum}. {artist} - {track title} - Winamp
 
     if trackinfo_raw != previous_track:
         previous_track = trackinfo_raw
         trackinfo = trackinfo_raw.split(" - ")[:-1]
-        track_pos = w.getCurrentTrack()  # Track position in the playlist
+        track_pos = w.get_track_position()  # Track position in the playlist
         artist = trackinfo[0].strip(f"{track_pos + 1}. ")
         track_name = " - ".join(trackinfo[1:])
-        pos, now = w.getTrackStatus()[1] / 1000, time.time()  # Both are in seconds
+        pos, now = w.get_track_status()[1] / 1000, time.time()  # Both are in seconds
 
         if len(track_name) < 2:
             track_name = f"Track: {track_name}"
@@ -75,11 +76,11 @@ def get_album_art(track_position: int, artist: str):
     :return: Album asset key and album name. Asset key in api must be exactly same as this key.
     """
 
-    w.dumpList()
+    w.dump_playlist()
     appdata_path = os.getenv("APPDATA")
     # Returns list of paths to every track in playlist which are in format
     # 'path_to_music_directory\\artist\\album\\track'
-    tracklist_paths = w.getTrackList(f"{appdata_path}\\Winamp\\Winamp.m3u8")
+    tracklist_paths = w.get_playlist(f"{appdata_path}\\Winamp\\Winamp.m3u8")
     # Get the current track's directory path
     track_path = os.path.dirname(tracklist_paths[track_position])
     # Get the tail of the path i.e. the album name
@@ -145,7 +146,7 @@ w = winamp.Winamp()
 rpc = Presence(client_id)
 rpc.connect()
 
-winamp_version = w.getVersion()
+winamp_version = w.get_version()
 previous_track = ""
 cleared = False
 
@@ -168,7 +169,7 @@ if custom_assets:
         custom_assets = False
 
 while True:
-    status = w.getPlayingStatus()
+    status = w.get_playing_status()
     if status == "paused" or status == "stopped" and not cleared:
         rpc.clear()
         previous_track = ""
