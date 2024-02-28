@@ -223,6 +223,13 @@ class Winamp:
         self.window_id = win32gui.FindWindow("Winamp v1.x", None)
         self._version = self.fetch_version()
 
+    def __ensure_connection(self):
+        """
+        Raise an exception if no Winamp client is connected, otherwise do nothing.
+        """
+        if self.window_id == 0:
+            raise ValueError("No Winamp client connected")
+
     def send_command(self, command: Union[WinampCommand, int]):
         """
         Send WM_COMMAND command to Winamp.
@@ -230,6 +237,7 @@ class Winamp:
         :param command: The command to send.
         :return: Response from Winamp.
         """
+        self.__ensure_connection()
 
         if isinstance(command, WinampCommand):
             command = command.value
@@ -245,6 +253,8 @@ class Winamp:
         :return: Response from the Winamp API.
         """
 
+        self.__ensure_connection()
+
         if isinstance(command, UserCommand):
             command = command.value
 
@@ -255,6 +265,7 @@ class Winamp:
         """
         The Winamp version.
         """
+        self.__ensure_connection()
 
         return self._version
 
@@ -270,6 +281,9 @@ class Winamp:
         playlist_position = self.get_playlist_position()
         length, position = self.get_track_status()
         sample_rate, bitrate, num_channels = self.get_track_info()
+
+        if not title and not playlist_position:
+            raise ValueError("No track selected")
 
         return CurrentTrack(title, sample_rate, bitrate, num_channels, length, position, playlist_position)
 
