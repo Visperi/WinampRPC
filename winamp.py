@@ -1,9 +1,7 @@
 """
-Python 3.6+ Winamp Controller
-
 MIT License
 
-Copyright (c) 2018-2019 Visperi
+Copyright (c) 2024 Visperi
 Copyright (c) 2001-2006 Shalabh Chaturvedi
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
