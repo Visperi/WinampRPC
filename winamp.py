@@ -26,12 +26,16 @@ SOFTWARE.
 """
 
 from enum import Enum
-from typing import Tuple, Union
+from typing import (
+    Tuple,
+    Union,
+    Optional,
+    List
+)
 
 import win32api
 import win32gui
 
-# Wonder why win32 imports don't define these
 WM_COMMAND = 0x0111
 WM_USER = 0x400
 
@@ -154,7 +158,8 @@ class PlayingStatus(Enum):
 
     Stopped = 0
     """
-    The player is stopped or not running.
+    The player is stopped or not running. Although this enum value has zero value, the status in Winamp is 'otherwise' 
+    stopped if it does not match playing or paused state.
     """
     Playing = 1
     """
@@ -181,7 +186,7 @@ class Track:
 
 class CurrentTrack(Track):
     """
-    A class representing current track.
+    A class representing current track in Winamp.
     """
 
     def __init__(self,
@@ -199,8 +204,16 @@ class CurrentTrack(Track):
 
 
 class Winamp:
+    """
+    a controller class for an open Winamp client.
+    """
 
     def __init__(self):
+        """
+        Initialize a Winamp controller class. If Winamp client is not open during the initialization, method
+        Winamp.connect() must be called afterwards before commands can be sent.
+        """
+
         self.window_id = None
         self._version = None
         self.connect()
@@ -219,7 +232,7 @@ class Winamp:
         if self.window_id == 0:
             raise ValueError("No Winamp client connected")
 
-    def send_command(self, command: Union[WinampCommand, int]):
+    def send_command(self, command: Union[WinampCommand, int]) -> int:
         """
         Send WM_COMMAND command to Winamp.
 
@@ -233,7 +246,7 @@ class Winamp:
 
         return win32api.SendMessage(self.window_id, WM_COMMAND, command, 0)
 
-    def send_user_command(self, command: Union[UserCommand, int], data: int = 0):
+    def send_user_command(self, command: Union[UserCommand, int], data: int = 0) -> int:
         """
         Send WM_USER command to Winamp API.
 
@@ -250,7 +263,7 @@ class Winamp:
         return win32api.SendMessage(self.window_id, WM_USER, data, command)
 
     @property
-    def version(self):
+    def version(self) -> str:
         """
         The Winamp version.
         """
@@ -259,11 +272,12 @@ class Winamp:
         return self._version
 
     @property
-    def current_track(self) -> CurrentTrack:
+    def current_track(self) -> Optional[CurrentTrack]:
         """
         Fetch the current track.
 
-        :return: CurrentTrack object that contains properties of the currently playing track.
+        :return: CurrentTrack object that contains properties of the currently playing track, or None if no track is
+        currently selected.
         """
 
         title = self.get_track_title()
@@ -271,8 +285,9 @@ class Winamp:
         length, position = self.get_track_status()
         sample_rate, bitrate, num_channels = self.get_track_info()
 
-        if not title and not playlist_position:
-            raise ValueError("No track selected")
+        if not title and length == 0 and sample_rate == 0 and bitrate == 0:
+            # No track selected
+            return None
 
         return CurrentTrack(title, sample_rate, bitrate, num_channels, length, position, playlist_position)
 
@@ -283,6 +298,7 @@ class Winamp:
         :return: Winamp version number
         """
 
+        # TODO: This can be improved to separate patch version from minor version
         # The version is formatted as 0x50yz for Winamp version 5.yz etc.
         hex_version = hex(self.send_user_command(UserCommand.WinampVersion))
 
@@ -306,18 +322,21 @@ class Winamp:
         """
         Get the current track status.
 
-        :return: A tuple (total_length, current_position), both in milliseconds. The track length is -1 if no
-        track is playing or an error occurred.
+        :return: A tuple (total_length, current_position), both in milliseconds.
         """
 
         track_position = self.send_user_command(UserCommand.TrackStatus, 0)
         track_length = self.send_user_command(UserCommand.TrackStatus, 1)
 
+        if track_length == -1:
+            raise ValueError("No track selected in Winamp")
+
         return track_length * 1000, track_position
 
-    def change_track(self, track_number: int):
+    def change_track(self, track_number: int) -> int:
         """
-        Change the track to specific track number.
+        Change the track to specific track number. If the track number is negative or bigger than the index of last
+        playlist tract index, the first or last track is selected.
 
         :param: Track number in the playlist, starting from 0.
         """
@@ -333,17 +352,18 @@ class Winamp:
 
         return self.send_user_command(UserCommand.PlaylistPosition)
 
-    def get_track_title(self):
+    def get_track_title(self) -> str:
         """
         Get the current track title.
 
         :return: Currently playing track title in format that is seen in Winamp's Window text. Usually in format
         '{track number}. {artist} - {track name} - Winamp'
         """
+        self.__ensure_connection()
 
         return win32gui.GetWindowText(self.window_id)
 
-    def seek_track(self, position: int):
+    def seek_track(self, position: int) -> int:
         """
         Seek current track position to position.
 
@@ -352,16 +372,16 @@ class Winamp:
 
         return self.send_user_command(UserCommand.SeekTrack, position)
 
-    def set_volume(self, volume_level: int):
+    def set_volume(self, volume_level: int) -> int:
         """
-        Set the playback volume.
+        Set the players' playback volume.
 
         :param volume_level: Volume level in range from 0 to 255.
         """
 
         return self.send_user_command(UserCommand.SetVolume, volume_level)
 
-    def get_playlist_length(self):
+    def get_playlist_length(self) -> int:
         """
         Get the number of tracks in current playlist.
 
@@ -394,7 +414,7 @@ class Winamp:
         return self.send_user_command(UserCommand.DumpPlaylist)
 
     @staticmethod
-    def get_playlist(playlist_filepath):
+    def get_playlist(playlist_filepath) -> List[str]:
         """
         Get paths to tracks in a playlist. A playlist dump is required for this method except if a playlist file in
         specific location is desired.
