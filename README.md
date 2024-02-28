@@ -1,66 +1,66 @@
 # WinampRPC
 
-This script simply connects your Winamp with Discord rich presence and shows current track and artist.
+A script reading playing status in Winamp and connecting it to Discord rich presence.
 
-Winamp.py is a slightly modified version of [this](https://github.com/DerpyChap/PyWinamp) winamp controller.
+Winamp.py is a standalone Winamp controller module fleshed out for modern python with OOP in mind. It was originally 
+based on was made by DerpyChap, and can be found from his [PyWinamp repository](https://github.com/DerpyChap/PyWinamp).
 
-Fast forwarding tracks is not currently supported but I think that could be implemented pretty easily. However if you 
-change the position of current track, pausing and unpausing or restarting the main.py should correct the elapsed time 
-in Discord. If the trackname is less than 2 characters long it is changed to format `Track: {trackname}` (see example 3). 
-This is because Discord rich presence supports only strings longer than one character.
+Fast-forwarding tracks is not currently supported. If the track position is changed, pausing and un-pausing the track 
+or restarting `main.py` should correct the elapsed time in Discord. If the track name one character long, 
+it is changed to format `Track: {track_name}`. This is due to Discord rich presence supporting only strings at least 
+two characters long.
 
 ## Requirements
 
-- Winamp
-- Python 3.6+
-- `pypresence` 3.3.0+
-- `pywin32` 224+
+The minimum Python version supported is 3.8.
 
-Any relatively new Winamp version should be fine. Im using the latest official version ([link](https://www.winamp.com/)).
+- Winamp
+- `pypresence` 4.3.0
+- `pywin32` 306
+
+Any relatively new Winamp version should be fine. Versions starting from 5.0 should be safe.
 
 ## How to use
 
-1. Ensure you meet the requirements
-2. Download the files and place them in the same directory
-3. (*optional*) Set up some custom assets
-4. Run main.py while using Winamp and Discord
+1. Clone the repository
+2. (*optional*) Set up some custom assets
+3. Run main.py while using Winamp and Discord
 
 ## Custom assets
 
-To show album art instead of default Winamp logo, you need to:
+Getting custom images to the rich presence is rather simple:
 
-1. Make your own Discord app for this script in their [Developer portal](https://discordapp.com/developers/applications/)
+1. Create a new Discord app for WinampRPC in Discords' [Developer portal](https://discordapp.com/developers/applications/) 
 2. Make files `album_covers.json` and `album_name_exceptions.txt`
 3. In `settings.json`
-    * Replace the `client_id` with your app id
-    * set `custom_assets` true 
-    * (*optional*) Define a default asset key and text for large asset (if given, this is shown when an album asset 
-    could not be found)
-    * (*optional*) Define a small asset key and text (if given, this is shown when a track is playing)
-4. Upload default assets with keys matching to ones given in `settings.json`
-5. Upload some album assets and add corresponding `album name: asset key` pairs to `album_covers.json` (so no default 
-asset keys are needed in this file)
+    * Replace the `client_id` with the new Discord app ID
+    * set `custom_assets` True
+    * (*optional*) Define a default asset key and text for large asset. If given, this image is shown when an album 
+    asset cannot be found from Discord API
+    * (*optional*) Define a small asset key and text. If given, this is shown when a track is playing
+4. Upload default assets with keys matching to ones given in `settings.json` (if any)
+5. Upload some album assets and add corresponding `album name: asset_key` pairs to `album_covers.json`. The default 
+asset keys are not needed in this file.
 
-If you have multiple albums with same names, add the duplicate album names to `album_name_exceptions.txt` each on their 
-own line. These album names are then returned in format `Artist - Album name` instead of just the album name.  
-Remember to take this into account when adding new keys to the api and `album_covers.json`.
+If there are many albums with same name, the album name must be added to `album_name_exceptions.txt` each on their own 
+line for the assets to work. For these albums the assets are searched in format `artist - album name` instead of only 
+the album name. Naturally this must also be taken into account when saving the assets into Discord API.
  
-Do note that due to restrictions in the api, following rules must be followed when adding album assets:
+Due to restrictions in the Discord asset API, following rules must be met with custom assets:
 
-- There can be maximum of 300 assets for your app
-- The keys must be maximum of 30 characters long
-- The keys must not have any special characters (including spaces)
-- The keys in `album_covers.json` and `settings.json` must be exact matches with the ones in the api
+- There can be maximum of 300 assets for an application
+- The asset keys cannot be longer than 30 characters long
+- The keys cannot have any special characters, including spaces
+- The asset keys in `album_covers.json` and `settings.json` must be exact matches with the ones in asset API
 
-In case Discord can't find any match for asset key from their api, the asset in question is simply ignored. Therefore 
-if you wish to leave the small asset out, just set the small asset key empty. Same thing applies to large 
-assets. If your large asset in Discord is missing, there are no matching keys for your default large asset or album 
-cover.
+If there are no matches for an asset key in Discord API, they are simply ignored. Therefore, if ignoring large or 
+small asset is needed, it is possible by leaving their asset keys empty. This also means if WinampRPC is working but 
+assets are not appearing, there are no matches between Discord API and the asset keys in local files.
 
 ## Examples
 
-As seen in these images, there should not be problem with showing any kind of characters as long as winamp can read 
-them properly.
+As these images show, there should not really be problem with any kind of alphabet as long as they are supported in 
+UTF-8.
 
 ![cyrillic example](https://i.imgur.com/Llzdby7.png)
 ![japanese example](https://i.imgur.com/7m51K2G.png)
