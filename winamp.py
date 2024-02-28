@@ -65,9 +65,6 @@ class Winamp:
     def get_filepath(self):
         return self.send_user_command(0, 3031)
 
-    def __getattr__(self, attr):
-        self.send_command(attr)
-
     @property
     def version(self):
         """
