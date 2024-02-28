@@ -1,6 +1,6 @@
 # WinampRPC
 
-A script reading playing status in Winamp and connecting it to Discord rich presence.
+A script reading playing status from Winamp and connecting it to Discord rich presence with images.
 
 Winamp.py is a standalone Winamp controller module fleshed out for modern python with OOP in mind. It was originally 
 based on was made by DerpyChap, and can be found from his [PyWinamp repository](https://github.com/DerpyChap/PyWinamp).
