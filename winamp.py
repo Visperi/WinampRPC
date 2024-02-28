@@ -291,7 +291,7 @@ class Winamp:
         length, position = self.get_track_status()
         sample_rate, bitrate, num_channels = self.get_track_info()
 
-        if not title and length == 0 and sample_rate == 0 and bitrate == 0:
+        if length == -1:
             # No track selected
             return None
 
