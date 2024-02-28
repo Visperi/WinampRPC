@@ -3,10 +3,11 @@
 A script reading playing status from Winamp and connecting it to Discord rich presence with images.
 
 Winamp.py is a standalone Winamp controller module fleshed out for modern python with OOP in mind. It was originally 
-based on was made by DerpyChap, and can be found from his [PyWinamp repository](https://github.com/DerpyChap/PyWinamp).
+based on controller made by DerpyChap, which can be found from his 
+[PyWinamp repository](https://github.com/DerpyChap/PyWinamp).
 
 Fast-forwarding tracks is not currently supported. If the track position is changed, pausing and un-pausing the track 
-or restarting `main.py` should correct the elapsed time in Discord. If the track name one character long, 
+or restarting `main.py` should correct the elapsed time in Discord. If the track name is one character long, 
 it is changed to format `Track: {track_name}`. This is due to Discord rich presence supporting only strings at least 
 two characters long.
 
