@@ -49,34 +49,43 @@ class Winamp:
                                 'raisevol': 40058,
                                 'lowervol': 40059}
 
-        self.hWinamp = win32gui.FindWindow('Winamp v1.x', None)
-        hexVersionNumber = hex(self.send_user_command(0))  # Returns Winamp version as 0x50yz for version 5.yz
-        self.version = f"{hexVersionNumber[2]}.{hexVersionNumber[4:]}"
+        self.window = win32gui.FindWindow('Winamp v1.x', None)
+        self._version = self.fetch_version()
 
     def send_command(self, command):
         if command in self.winamp_commands:
-            return win32api.SendMessage(self.hWinamp, WM_COMMAND, self.winamp_commands[command], 0)
+            return win32api.SendMessage(self.window, WM_COMMAND, self.winamp_commands[command], 0)
         else:
             print("NoSuchWinampCommand")
             exit()
 
-    def __getattr__(self, attr):
-        self.send_command(attr)
-
     def send_user_command(self, id_: int, data: int = 0):
-        return win32api.SendMessage(self.hWinamp, WM_USER, data, id_)
+        return win32api.SendMessage(self.window, WM_USER, data, id_)
 
     def get_filepath(self):
         return self.send_user_command(0, 3031)
 
-    def get_version(self):
+    def __getattr__(self, attr):
+        self.send_command(attr)
+
+    @property
+    def version(self):
         """
-        Get Winamp version.
+        The Winamp version.
+        """
+
+        return self._version
+
+    def fetch_version(self) -> str:
+        """
+        Fetch the Winamp version for currently open instance.
 
         :return: Winamp version number
         """
 
-        return self.version
+        hex_version = self.send_user_command(0)  # Formatted as 0x50yz for Winamp version 5.yz etc.
+
+        return f"{hex_version[2]}.{hex_version[4:]}"
 
     def get_playing_status(self) -> str:
         """
@@ -134,7 +143,7 @@ class Winamp:
         '{track number}. {artist} - {track name} - Winamp'
         """
 
-        return win32gui.GetWindowText(self.hWinamp)
+        return win32gui.GetWindowText(self.window)
 
     def seek_track(self, position: int):
         """

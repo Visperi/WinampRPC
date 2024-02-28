@@ -146,7 +146,7 @@ w = winamp.Winamp()
 rpc = Presence(client_id)
 rpc.connect()
 
-winamp_version = w.get_version()
+winamp_version = w.version
 previous_track = ""
 cleared = False
 
