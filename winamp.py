@@ -156,8 +156,8 @@ class PlayingStatus(Enum):
 
     Stopped = 0
     """
-    The player is stopped or not running. Although this enum value has zero value, the status in Winamp is 'otherwise' 
-    stopped if it does not match playing or paused state.
+    The player is stopped or not running. Although this enum value has value of zero, the status in Winamp is 
+    'otherwise' returned as stopped if it does not match playing status or paused status.
     """
     Playing = 1
     """
