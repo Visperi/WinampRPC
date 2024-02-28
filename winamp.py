@@ -1,7 +1,7 @@
 """
 MIT License
 
-Copyright (c) 2024 Visperi
+Copyright (c) 2018 Niko Mätäsaho
 Copyright (c) 2001-2006 Shalabh Chaturvedi
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
