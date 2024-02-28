@@ -136,7 +136,7 @@ class UserCommand(Enum):
     """
     Get the current playlist length in number of tracks.
     """
-    TrackPosition = 125
+    PlaylistPosition = 125
     """
     Get the current playlist position in tracks.
     """
@@ -294,7 +294,8 @@ class Winamp:
         :return: Winamp version number
         """
 
-        hex_version = hex(self.send_user_command(0))  # Formatted as 0x50yz for Winamp version 5.yz etc.
+        # The version is formatted as 0x50yz for Winamp version 5.yz etc.
+        hex_version = hex(self.send_user_command(UserCommand.WinampVersion))
 
         return f"{hex_version[2]}.{hex_version[4:]}"
 
@@ -320,8 +321,8 @@ class Winamp:
         track is playing or an error occurred.
         """
 
-        track_position = self.send_user_command(105, 0)
-        track_length = self.send_user_command(105, 1)
+        track_position = self.send_user_command(UserCommand.TrackStatus, 0)
+        track_length = self.send_user_command(UserCommand.TrackStatus, 1)
 
         return track_length * 1000, track_position
 
@@ -332,7 +333,7 @@ class Winamp:
         :param: Track number in the playlist, starting from 0.
         """
 
-        return self.send_user_command(121, track_number)
+        return self.send_user_command(UserCommand.ChangeTrack, track_number)
 
     def get_playlist_position(self):
         """
@@ -341,7 +342,7 @@ class Winamp:
         :return: The currently selected track position in the playlist, starting from 0.
         """
 
-        return self.send_user_command(125)
+        return self.send_user_command(UserCommand.PlaylistPosition)
 
     def get_track_title(self):
         """
@@ -360,7 +361,7 @@ class Winamp:
         :param position: Seek position in milliseconds.
         """
 
-        return self.send_user_command(106, position)
+        return self.send_user_command(UserCommand.SeekTrack, position)
 
     def set_volume(self, volume_level: int):
         """
@@ -369,7 +370,7 @@ class Winamp:
         :param volume_level: Volume level in range from 0 to 255.
         """
 
-        return self.send_user_command(122, volume_level)
+        return self.send_user_command(UserCommand.SetVolume, volume_level)
 
     def get_playlist_length(self):
         """
@@ -378,7 +379,7 @@ class Winamp:
         :return: Number of tracks
         """
 
-        return self.send_user_command(124)
+        return self.send_user_command(UserCommand.PlaylistLength)
 
     def get_track_info(self) -> Tuple[int, int, int]:
         """
@@ -401,7 +402,7 @@ class Winamp:
         :return: The position of currently playing track in the playlist, starting from 0
         """
 
-        return self.send_user_command(120)
+        return self.send_user_command(UserCommand.DumpPlaylist)
 
     @staticmethod
     def get_playlist(playlist_filepath):
