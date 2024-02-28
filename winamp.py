@@ -337,18 +337,20 @@ class Winamp:
         except ValueError:
             return PlayingStatus.Stopped
 
-    def get_track_status(self) -> Tuple[int, int]:
+    def get_track_status(self) -> Optional[Tuple[int, int]]:
         """
         Get the current track status.
 
-        :return: A tuple (total_length, current_position), both in milliseconds.
+        :return: A tuple containing track length and current track position in milliseconds, or None if no track is
+        currently selected.
         """
 
         track_position = self.send_user_command(UserCommand.TrackStatus, 0)
         track_length = self.send_user_command(UserCommand.TrackStatus, 1)
 
         if track_length == -1:
-            raise ValueError("No track selected in Winamp")
+            # No track is currently selected
+            return None
 
         return track_length * 1000, track_position
 
