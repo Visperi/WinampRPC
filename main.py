@@ -26,7 +26,7 @@ import time
 import os
 import json
 
-import winamp
+from winamp import Winamp, PlayingStatus
 from pypresence import Presence
 
 
@@ -142,7 +142,7 @@ custom_assets = settings["custom_assets"]
 if client_id == "default":
     client_id = "507484022675603456"
 
-w = winamp.Winamp()
+w = Winamp()
 rpc = Presence(client_id)
 rpc.connect()
 
@@ -170,11 +170,11 @@ if custom_assets:
 
 while True:
     status = w.get_playing_status()
-    if status == "paused" or status == "stopped" and not cleared:
+    if status == PlayingStatus.Paused or status == PlayingStatus.Stopped and not cleared:
         rpc.clear()
         previous_track = ""
         cleared = True
 
-    elif status == "playing":
+    elif status == PlayingStatus.Playing:
         update_rpc()
     time.sleep(1)
