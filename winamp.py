@@ -147,6 +147,25 @@ class UserCommand(Enum):
     """
 
 
+class PlayingStatus(Enum):
+    """
+    Enum representing the current playing status of Winamp player.
+    """
+
+    Stopped = 0
+    """
+    The player is stopped or not running.
+    """
+    Playing = 1
+    """
+    A track is currently playing. 
+    """
+    Paused = 3
+    """
+    Current track is paused.
+    """
+
+
 class Track:
     """
     A class representing a track.
@@ -265,23 +284,19 @@ class Winamp:
 
         return f"{hex_version[2]}.{hex_version[4:]}"
 
-    def get_playing_status(self) -> str:
+    def get_playing_status(self) -> PlayingStatus:
         """
         Get current playing status.
 
-        :return: The current playing status which is 'playing', 'paused' or 'stopped'
+        :return: The current playing status as PlayingStatus enumeration value.
         """
 
         status = self.send_user_command(104)
 
-        if status == 1:
-            playing_status = "playing"
-        elif status == 3:
-            playing_status = "paused"
-        else:
-            playing_status = "stopped"
-
-        return playing_status
+        try:
+            return PlayingStatus(status)
+        except ValueError:
+            return PlayingStatus.Stopped
 
     def get_track_status(self) -> Tuple[int, int]:
         """
