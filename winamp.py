@@ -208,10 +208,22 @@ class CurrentTrack(Track):
         self.playlist_position = playlist_position
 
 
+class NoTrackSelectedError(Exception):
+    """
+    Exception raised when track is not selected in Winamp and one is required for requested operation.
+    """
+
+
 class Winamp:
     """
     a controller class for an open Winamp client.
     """
+
+    NO_TRACK_SELECTED = 4294967295
+    """
+    A value Winamp returns for specific commands when the playlist is empty.
+    """
+    DEFAULT_NO_TRACK_MESSAGE = "No track selected in Winamp"
 
     def __init__(self):
         """
@@ -241,13 +253,14 @@ class Winamp:
 
     def send_command(self, command: Union[MenuCommand, int]) -> int:
         """
-        Send WM_COMMAND command to Winamp.
+        Send WM_COMMAND message to Winamp. These commands are identical to pressing menus and buttons in the player.
 
-        :param command: The command to send.
+        :param command: MenuCommand object or the ID of the message to send.
         :return: Response from Winamp. Should be zero if the command is processed normally.
 
         :raises ConnectionError: If a connection to Winamp client is not established.
         """
+
         self.__ensure_connection()
 
         if isinstance(command, MenuCommand):
@@ -257,9 +270,9 @@ class Winamp:
 
     def send_user_command(self, command: Union[UserCommand, int], data: int = 0) -> int:
         """
-        Send WM_USER command to Winamp API.
+        Send WM_USER message to Winamp API. These commands are a programmatic way to communicate with the Winamp API.
 
-        :param command: The command to send.
+        :param command: UserCommand object or the ID of the message to send.
         :param data: Data to send with the command. For some commands this value affects the returned information.
         :return: Response from the Winamp API.
 
@@ -293,14 +306,13 @@ class Winamp:
         currently selected.
         """
 
-        title = self.get_track_title()
         playlist_position = self.get_playlist_position()
+        if not playlist_position:
+            return None
+
+        title = self.get_track_title()
         length, position = self.get_track_status()
         sample_rate, bitrate, num_channels = self.get_track_info()
-
-        if length == -1:
-            # No track selected
-            return None
 
         return CurrentTrack(title, sample_rate, bitrate, num_channels, length, position, playlist_position)
 
@@ -350,51 +362,66 @@ class Winamp:
 
         :return: A tuple containing track length and current track position in milliseconds, or None if no track is
         currently selected.
+        :raises NoTrackSelectedError: If no track is selected in Winamp.
         """
 
         track_position = self.send_user_command(UserCommand.TrackStatus, 0)
         track_length = self.send_user_command(UserCommand.TrackStatus, 1)
 
-        if track_length == -1:
-            # No track is currently selected
-            return None
+        if track_length == self.NO_TRACK_SELECTED:
+            raise NoTrackSelectedError(self.DEFAULT_NO_TRACK_MESSAGE)
 
         return track_length * 1000, track_position
 
     def change_track(self, track_number: int) -> int:
         """
         Change the track to specific track number. If the track number is negative or bigger than the index of last
-        playlist tract index, the first or last track is selected.
+        playlist tract index, the first or last track is selected. Has no effect if playlist is empty.
 
         :param: Zero if the track was successfully changed.
         """
 
         return self.send_user_command(UserCommand.ChangeTrack, track_number)
 
-    def get_playlist_position(self):
+    def get_playlist_position(self) -> Optional[int]:
         """
         Get current track position in the playlist.
 
         :return: The currently selected track position in the playlist, starting from 0.
+        :return: Currently selected track position in the playlist starting from 0, or None if no track selected.
         """
 
-        return self.send_user_command(UserCommand.PlaylistPosition)
+        position = self.send_user_command(UserCommand.PlaylistPosition)
+        if position == self.NO_TRACK_SELECTED:
+            return None
+
+        return position
 
     def seek_track(self, position: int) -> int:
         """
         Seek current track position to position.
 
         :param position: Seek position in milliseconds.
+        :raises NoTrackSelectedError: If no track is selected in Winamp.
         """
 
-        return self.send_user_command(UserCommand.SeekTrack, position)
+        ret = self.send_user_command(UserCommand.SeekTrack, position)
+        if ret == self.NO_TRACK_SELECTED:
+            raise NoTrackSelectedError(self.DEFAULT_NO_TRACK_MESSAGE)
+
+        return ret
 
     def set_volume(self, volume_level: int) -> int:
         """
         Set the players' playback volume.
 
         :param volume_level: Volume level in range from 0 to 255.
+        :return: Zero if the volume was successfully set.
+        :raises ValueError: If the volume level is outbounds.
         """
+
+        if volume_level < 0 or volume_level > 255:
+            raise ValueError("Volume level must be in range [0, 255]")
 
         return self.send_user_command(UserCommand.SetVolume, volume_level)
 
@@ -402,7 +429,7 @@ class Winamp:
         """
         Get the number of tracks in current playlist.
 
-        :return: Number of tracks
+        :return: Number of tracks in the playlist.
         """
 
         return self.send_user_command(UserCommand.PlaylistLength)
@@ -412,11 +439,15 @@ class Winamp:
         Get the currently selected track technical information.
 
         :return: Sample rate, bitrate and number of audio channels of currently playing track.
+        :raises NoTrackSelectedError: If no track is selected in Winamp.
         """
 
         sample_rate = self.send_user_command(UserCommand.TrackInfo, 0)
         bitrate = self.send_user_command(UserCommand.TrackInfo, 1)
         num_channels = self.send_user_command(UserCommand.TrackInfo, 2)
+
+        if sample_rate == 0 and bitrate == 0 and num_channels == 0:
+            raise NoTrackSelectedError("No track selected in Winamp")
 
         return sample_rate, bitrate, num_channels
 
