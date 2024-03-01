@@ -35,13 +35,19 @@ import win32api
 import win32gui
 
 WM_COMMAND = 0x0111
+"""
+First slot for menu control messages in Windows API.
+"""
 WM_USER = 0x400
+"""
+First slot for user defined messages in Windows API.
+"""
 
 
-class WinampCommand(Enum):
+class MenuCommand(Enum):
     """
-    Enum representing WM_COMMAND commands with correct data values. These commands are identical to pressing a
-    button in the player GUI.
+    Enum representing WM_COMMAND commands with correct data values. These commands are identical to pressing menus
+    and buttons in the player GUI.
     """
 
     ToggleRepeat = 40022
@@ -100,8 +106,9 @@ class WinampCommand(Enum):
 
 class UserCommand(Enum):
     """
-    Enum representing WM_USER user commands sent to Winamp. These commands are sent to Winamp API and are not strictly
-    equal to pressing buttons in player GUI. Setter commands often need a separate value 'data' to have effect.
+    Enum representing WM_USER user commands sent to Winamp. These commands are sent programmatically to Winamp API and
+    are not strictly equal to pressing buttons in player GUI. Setter commands often need a separate value 'data' to
+    have effect.
     """
 
     WinampVersion = 0
@@ -232,18 +239,18 @@ class Winamp:
         if self.window_id == 0:
             raise ConnectionError("No Winamp client connected")
 
-    def send_command(self, command: Union[WinampCommand, int]) -> int:
+    def send_command(self, command: Union[MenuCommand, int]) -> int:
         """
         Send WM_COMMAND command to Winamp.
 
         :param command: The command to send.
-        :return: Response from Winamp.
+        :return: Response from Winamp. Should be zero if the command is processed normally.
 
         :raises ConnectionError: If a connection to Winamp client is not established.
         """
         self.__ensure_connection()
 
-        if isinstance(command, WinampCommand):
+        if isinstance(command, MenuCommand):
             command = command.value
 
         return win32api.SendMessage(self.window_id, WM_COMMAND, command, 0)
@@ -359,7 +366,7 @@ class Winamp:
         Change the track to specific track number. If the track number is negative or bigger than the index of last
         playlist tract index, the first or last track is selected.
 
-        :param: Track number in the playlist, starting from 0.
+        :param: Zero if the track was successfully changed.
         """
 
         return self.send_user_command(UserCommand.ChangeTrack, track_number)
@@ -418,7 +425,7 @@ class Winamp:
         Dump the current playlist into file WINAMPDIR/winamp.m3u. WINAMPDIR is by default located in
         C:/Users/user/AppData/Roaming/Winamp/.
 
-        :return: The position of currently playing track in the playlist, starting from 0
+        :return: The position of currently playing track in the playlist, starting from 0.
         """
 
         return self.send_user_command(UserCommand.DumpPlaylist)
