@@ -16,8 +16,8 @@ two characters long.
 The minimum Python version supported is 3.8.
 
 - Winamp
-- `pypresence` 4.3.0
-- `pywin32` 306
+- `pypresence`
+- `pywin32`
 
 Any relatively new Winamp version should be fine. Versions starting from 5.0 should be safe.
 
@@ -26,6 +26,9 @@ Any relatively new Winamp version should be fine. Versions starting from 5.0 sho
 1. Clone the repository
 2. (*optional*) Set up some custom assets
 3. Run main.py while using Winamp and Discord
+
+In case there are some troubles with pywin32 especially after updating Python, running pip upgrade command should 
+solve this: `python -m pip install --upgrade pywin32`.  
 
 ## Custom assets
 
