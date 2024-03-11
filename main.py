@@ -87,7 +87,7 @@ def get_album_art(track_position: int, artist: str):
     album_name = os.path.basename(track_path)
 
     large_asset_text = album_name
-    # If there are multiple albums with same name and they are added into exceptions file, use 'Artist - Album' instead
+    # If there are multiple albums with same name, and they are added into exceptions file, use 'Artist - Album' instead
     if album_name in album_exceptions:
         album_key = f"{artist} - {album_name}"
     else:
@@ -168,6 +168,10 @@ if custom_assets:
         print("Could not find album_covers.json. Default assets will be used.")
         custom_assets = False
 
+
+print()
+print("Winamp status is now being updated to Discord (if the Discord activity privacy settings allow this).")
+print("To exit, simply press CTRL + C.")
 while True:
     status = w.get_playing_status()
     if status == PlayingStatus.Paused or status == PlayingStatus.Stopped and not cleared:
