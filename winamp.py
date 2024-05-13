@@ -182,6 +182,13 @@ class Track:
     """
 
     def __init__(self, title: str, sample_rate: int, bitrate: int, channels: int, length: int):
+        """
+        :param title: The track title in Winamp window. Usually in format {track_num}. {artist} - {track_name} - Winamp
+        :param sample_rate: The track sample rate
+        :param bitrate: The track bitrate
+        :param channels: Number of channels in the track
+        :param length: The track length in milliseconds
+        """
         self.title = title
         self.sample_rate = sample_rate
         self.bitrate = bitrate
@@ -203,6 +210,15 @@ class CurrentTrack(Track):
                  current_position: int,
                  playlist_position: int
                  ):
+        """
+        :param title: The track title in Winamp window. Usually in format {tracknum}. {artist} - {track_name} - Winamp
+        :param sample_rate: The track sample rate
+        :param bitrate: The track bitrate
+        :param channels: Number of channels in the track
+        :param length: The track length in milliseconds
+        :param current_position: Track current position in milliseconds
+        :param playlist_position: Track position in the playlist, starting from zero
+        """
         super().__init__(title, sample_rate, bitrate, channels, length)
         self.current_position = current_position
         self.playlist_position = playlist_position
@@ -360,8 +376,7 @@ class Winamp:
         """
         Get the current track status.
 
-        :return: A tuple containing track length and current track position in milliseconds, or None if no track is
-        currently selected.
+        :return: A tuple containing track length and current track position in milliseconds.
         :raises NoTrackSelectedError: If no track is selected in Winamp.
         """
 
