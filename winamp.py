@@ -372,7 +372,7 @@ class Winamp:
         except ValueError:
             return PlayingStatus.Stopped
 
-    def get_track_status(self) -> Optional[Tuple[int, int]]:
+    def get_track_status(self) -> Tuple[int, int]:
         """
         Get the current track status.
 
