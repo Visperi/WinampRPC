@@ -1,4 +1,8 @@
 """
+A controller module for Winamp. Use Winamp class to control the player through both its API and pressing GUI buttons.
+"""
+
+"""
 MIT License
 
 Copyright (c) 2018 Niko Mätäsaho
