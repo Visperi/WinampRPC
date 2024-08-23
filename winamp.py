@@ -236,7 +236,7 @@ class NoTrackSelectedError(Exception):
 
 class Winamp:
     """
-    a controller class for an open Winamp client.
+    a controller class for Winamp. Connect method must be called to control an open Winamp client.
     """
 
     NO_TRACK_SELECTED = 4294967295
