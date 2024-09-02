@@ -61,30 +61,34 @@ def update_rpc():
         cleared = False
 
 
+import os
+from mutagen import File
+
 def get_album_art(track_position: int, artist: str):
     """
-    Dump current playlist into C:\\Users\\username\\Appdata\\Roaming\\Winamp\\Winamp.m3u8. Then read the path of current
-    track from the file and find the album name from it. If album has corresponding album name with key in file
-    album_covers.json, return the asset key and album name. Otherwise return default asset key and text. Also, this
-    function assumes the music directory structure is like artist\\album\\tracks. If the folder structure is something
-    else, the album_name variable may not be the album name and you need to check these manually.
+    Get the album name from the track's metadata. If the album has a corresponding
+    album name with key in file album_covers.json, return the asset key and album name.
+    Otherwise return default asset key and text.
     This function is used only if custom_assets is set to True and album_covers.json is found.
 
     :param track_position: Current track's position in the playlist, starting from 0
-    :param artist: Current track's artist. This is needed in case album name is in exceptions i.e. there are multiple
-    albums with same name
+    :param artist: Current track's artist. This is needed in case album name is in exceptions
     :return: Album asset key and album name. Asset key in api must be exactly same as this key.
     """
 
     w.dump_playlist()
     appdata_path = os.getenv("APPDATA")
-    # Returns list of paths to every track in playlist which are in format
-    # 'path_to_music_directory\\artist\\album\\track'
+    # Returns list of paths to every track in playlist
     tracklist_paths = w.get_playlist(f"{appdata_path}\\Winamp\\Winamp.m3u8")
-    # Get the current track's directory path
-    track_path = os.path.dirname(tracklist_paths[track_position])
-    # Get the tail of the path i.e. the album name
-    album_name = os.path.basename(track_path)
+    # Get the current track's path
+    track_path = tracklist_paths[track_position]
+
+    # Get metadata from the file
+    audio = File(track_path)
+    if audio is not None:
+        album_name = audio.get('album', ['Unknown Album'])[0]
+    else:
+        album_name = 'Unknown Album'
 
     large_asset_text = album_name
     # If there are multiple albums with same name, and they are added into exceptions file, use 'Artist - Album' instead
