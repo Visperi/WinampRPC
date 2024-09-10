@@ -369,7 +369,7 @@ class Winamp:
         :return: The current playing status as PlayingStatus enumeration value.
         """
 
-        status = self.send_user_command(104)
+        status = self.send_user_command(UserCommand.PlayingStatus)
 
         try:
             return PlayingStatus(status)
